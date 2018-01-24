@@ -34,9 +34,14 @@ class API:
         kwargs.setdefault('headers', {})
         kwargs['headers'].update(self._headers)
 
+        url = '{}{}'.format(self.base_url, endpoint)
+
+        if kwargs.pop('raw_url', False):
+            url = endpoint
+
         response = requests.request(
             method=method,
-            url='{}{}'.format(self.base_url, endpoint),
+            url=url,
             **kwargs
         )
         response.raise_for_status()

@@ -1,7 +1,10 @@
 from marshmallow import Schema, fields
 
 from front import mixins
+from front.api import client
+from front.fields import UnixEpochDateTime
 from front.search import ListSet
+from front.util import import_dotted_path
 
 
 class ResourceMeta(type):
@@ -48,11 +51,24 @@ class Resource(metaclass=ResourceMeta):
         abstract = True
 
     def __init__(self, **data):
+        self._related = {}
+        self._raw_related = {}
+        self._orig_data = {}
         self._set_fields(data)
 
     def _set_fields(self, data):
         for field, value in data.items():
             setattr(self, field, value)
+
+    def set_related(self):
+        related = self._orig_data['_links']['related']
+        self._raw_related = related
+
+        if 'inbox' in related:
+            self._related[Inbox] = related['inbox']
+
+    def get_related_url(self, related_cls):
+        return self._related[related_cls]
 
     @property
     def _raw_data(self):
@@ -65,12 +81,67 @@ class Resource(metaclass=ResourceMeta):
         data = cls._load_raw(orig_data)
         instance = cls(**data)
         instance._orig_data = orig_data
+        instance.set_related()
         return instance
 
     @classmethod
     def _load_raw(cls, raw_data):
         data, _ = cls.Meta.schema.load(raw_data)
         return data
+
+
+class Related:
+    def __init__(self, related_cls, many=False, sub=False, required=False):
+        self._related_cls = related_cls
+        self.many = many
+        self.sub = sub
+        self.required = required
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        if self.many or self.sub:
+            if self.many:
+                list_path = self.related_cls.Meta.list_path
+                response = client.get(instance._get_path() + list_path)
+
+                return ListSet(
+                    resource_cls=self.related_cls,
+                    response=response,
+                )
+            else:
+                path = instance.get_related_url(self.related_cls)
+                response = client.get(path, raw_url=True)
+                return self.related_cls.from_api_data(response)
+        else:
+            attr = self.find_parent_attr(type(instance))
+            id = getattr(instance, '%s_id' % attr)
+            if id is None:
+                return None
+            return self.related_cls.objects.get(id=id)
+
+    @property
+    def related_cls(self):
+        if isinstance(self._related_cls, str):
+            self._related_cls = import_dotted_path(self._related_cls)
+        return self._related_cls
+
+    def find_parent_attr(self, parent_cls):
+        for attr in dir(parent_cls):
+            if getattr(parent_cls, attr) is self:
+                return attr
+        else:
+            raise AttributeError('Cannot find self')
+
+    def modify_schema_attrs(self, self_attr, schema_attrs):
+        if self.many or self.sub:
+            return schema_attrs
+
+        allow_none = (self.required is False)
+        field = fields.Integer(allow_none=allow_none)
+        schema_attrs['%s_id' % self_attr] = field
+        return schema_attrs
 
 
 class Manager:
@@ -99,6 +170,87 @@ class Manager:
         return fresh.all()
 
 
+class Handle(Schema):
+    handle = fields.Str()
+    source = fields.Str()
+
+
+class Contact(Resource, mixins.Readable):
+    class Meta:
+        list_path = 'contacts/'
+        detail_path = 'contacts/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    name = fields.Str()
+    description = fields.Str()
+    avatar_url = fields.Str()
+    is_spammer = fields.Bool()
+    links = fields.List(fields.Url, many=True)
+    handles = fields.Nested(Handle, many=True)
+
+
+class Tag(Resource, mixins.Readable):
+    class Meta:
+        list_path = 'tags/'
+        detail_path = 'tags/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    name = fields.Str()
+
+
+class Channel(Resource, mixins.Readable, mixins.Creatable):
+    class Meta:
+        list_path = 'channels/'
+        detail_path = 'channels/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    address = fields.Str()
+    type = fields.Str()
+    send_as = fields.Str(allow_none=True, required=False)
+    settings = fields.Dict()
+
+    inbox = Related('front.Inbox', sub=True)
+
+
+class Conversation(Resource, mixins.Readable):
+    class Meta:
+        list_path = 'conversations/'
+        detail_path = 'conversations/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    subject = fields.Str()
+    status = fields.Str()
+    assignee = fields.Nested('TeammateSchema')
+    recipient = fields.Nested('ContactSchema')
+    tags = fields.Nested('TagSchema', many=True)
+    # last_message = None  # todo
+    created_at = UnixEpochDateTime()
+
+
+class Inbox(Resource, mixins.Readable, mixins.Creatable):
+    class Meta:
+        list_path = 'inboxes/'
+        create_path = 'inboxes/'
+        detail_path = 'inboxes/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    name = fields.Str()
+
+    conversations = Related(Conversation, many=True)
+    teammates = Related('front.Teammate', many=True)
+    channels = Related(Channel, many=True)
+
+
 class Teammate(Resource, mixins.Readable):
     class Meta:
         list_path = 'teammates/'
@@ -113,3 +265,6 @@ class Teammate(Resource, mixins.Readable):
     last_name = fields.Str()
     is_admin = fields.Bool()
     is_available = fields.Bool()
+
+    inboxes = Related(Inbox, many=True)
+    conversations = Related(Conversation, many=True)
