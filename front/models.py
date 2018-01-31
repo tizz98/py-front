@@ -228,7 +228,7 @@ class Conversation(Resource, mixins.Readable):
     id = fields.Str()
     subject = fields.Str()
     status = fields.Str()
-    assignee = fields.Nested('TeammateSchema')
+    assignee = fields.Nested('TeammateSchema', allow_none=True)
     recipient = fields.Nested('ContactSchema')
     tags = fields.Nested('TagSchema', many=True)
     # last_message = None  # todo
