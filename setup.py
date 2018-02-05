@@ -20,6 +20,8 @@ setup(
     install_requires=[
         "requests==2.18.4",
         "marshmallow==2.15.0",
+        "six==1.11.0",
+        "pytz==2017.3",
     ],
     packages=[
         "front",

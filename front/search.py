@@ -3,7 +3,7 @@ from itertools import tee
 from front.api import client
 
 
-class ListSet:
+class ListSet(object):
     _pagination_key = '_pagination'
     _next_key = 'next'
     _results_key = '_results'
@@ -27,19 +27,23 @@ class ListSet:
 
     def _results_generator(self):
         if self._pagination_key in self._response:
-            yield from self._paginate()
+            for value in self._paginate():
+                yield value
         else:
-            yield from self._build_resources(self._response[self._results_key])
+            for value in self._build_resources(self._response[self._results_key]):  # noqa: E501
+                yield value
 
     def _paginate(self):
         next_page = self._response[self._pagination_key].get(self._next_key)
         if next_page is None:
-            yield from self._build_resources(self._response[self._results_key])
+            for value in self._build_resources(self._response[self._results_key]):  # noqa: E501
+                yield value
         else:
             while next_page is not None:
-                yield from self._build_resources(
+                for value in self._build_resources(
                     rows=self._response[self._results_key]
-                )
+                ):
+                    yield value
 
                 self._response = client.get(next_page, raw_url=True)
                 pagination_data = self._response[self._pagination_key]

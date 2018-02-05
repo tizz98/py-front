@@ -3,7 +3,7 @@ import requests
 from front import exceptions
 
 
-class API:
+class API(object):
     base_url = 'https://api2.frontapp.com/'
 
     def __init__(self):

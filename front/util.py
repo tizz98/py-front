@@ -1,6 +1,6 @@
 import importlib
 
-from datetime import timezone, datetime
+import pytz
 
 
 def import_dotted_path(path):
@@ -31,7 +31,7 @@ def import_dotted_path(path):
     return found
 
 
-def datetime_to_utc_timestamp(dt: datetime) -> float:
-    if dt.tzinfo != timezone.utc:
+def datetime_to_utc_timestamp(dt):
+    if dt.tzinfo != pytz.utc:
         raise ValueError('datetime must have tzinfo set to UTC')
     return dt.timestamp()

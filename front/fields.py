@@ -15,4 +15,4 @@ class UnixEpochDateTime(fields.DateTime):
     }
 
     def __init__(self, **kwargs):
-        super().__init__('epoch', **kwargs)
+        super(UnixEpochDateTime, self).__init__('epoch', **kwargs)
