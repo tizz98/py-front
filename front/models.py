@@ -1,3 +1,5 @@
+import six
+
 from marshmallow import Schema, fields
 
 from front import mixins
@@ -46,7 +48,7 @@ class ResourceMeta(type):
         return super_new(cls, name, bases, attrs)
 
 
-class Resource(metaclass=ResourceMeta):
+class Resource(six.with_metaclass(ResourceMeta)):
     class Meta:
         abstract = True
 
