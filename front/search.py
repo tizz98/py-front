@@ -3,7 +3,7 @@ from itertools import tee
 from front.api import client
 
 
-class ListSet:
+class ListSet(object):
     _pagination_key = '_pagination'
     _next_key = 'next'
     _results_key = '_results'

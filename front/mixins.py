@@ -1,7 +1,7 @@
 from front.api import client
 
 
-class Readable:
+class Readable(object):
     def read(self):
         path = self._get_path()
         data = self._load_raw(client.get(path))

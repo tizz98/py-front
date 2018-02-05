@@ -92,7 +92,7 @@ class Resource(six.with_metaclass(ResourceMeta)):
         return data
 
 
-class Related:
+class Related(object):
     def __init__(self, related_cls, many=False, sub=False, required=False):
         self._related_cls = related_cls
         self.many = many
@@ -146,7 +146,7 @@ class Related:
         return schema_attrs
 
 
-class Manager:
+class Manager(object):
     _search_cls = ListSet
 
     def get(self, id):
