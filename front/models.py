@@ -185,10 +185,10 @@ class Contact(Resource, mixins.Readable):
     objects = Manager()
 
     id = fields.Str()
-    name = fields.Str()
+    name = fields.Str(allow_none=True)
     description = fields.Str()
-    avatar_url = fields.Str()
-    is_spammer = fields.Bool()
+    avatar_url = fields.Str(allow_none=True)
+    is_spammer = fields.Bool(missing=None)
     links = fields.List(fields.Url, many=True)
     handles = fields.Nested(Handle, many=True)
 
