@@ -31,7 +31,7 @@ def import_dotted_path(path):
     return found
 
 
-def datetime_to_utc_timestamp(dt):
+def datetime_to_utc_timestamp(dt, *args, **kwargs):
     if dt.tzinfo != pytz.utc:
         raise ValueError('datetime must have tzinfo set to UTC')
     return dt.timestamp()
