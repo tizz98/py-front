@@ -23,7 +23,7 @@ class API(object):
         return self._request('get', endpoint, params=params, **kwargs)
 
     def put(self, endpoint, data=None, json=None, **kwargs):
-        return self._request('endpoint', data=data, json=json, **kwargs)
+        return self._request('put', endpoint, data=data, json=json, **kwargs)
 
     def _request(self, method, endpoint, **kwargs):
         if self.jwt_key is None:
