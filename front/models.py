@@ -219,11 +219,13 @@ class Channel(Resource, mixins.Readable, mixins.Creatable):
 
     inbox = Related('front.Inbox', sub=True)
 
+
 class Recipient(Schema):
 
     contact = Related(Contact)
     handle = fields.Str()
     role = fields.Str()
+
 
 class Message(Resource, mixins.Readable):
     class Meta:
@@ -242,7 +244,7 @@ class Message(Resource, mixins.Readable):
     is_inbound = fields.Boolean()
     recipients = fields.Nested(Recipient, many=True)
     text = fields.Str()
-    
+
 
 class Conversation(Resource, mixins.Readable):
     class Meta:
