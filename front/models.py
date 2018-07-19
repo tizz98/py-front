@@ -220,6 +220,32 @@ class Channel(Resource, mixins.Readable, mixins.Creatable):
     inbox = Related('front.Inbox', sub=True)
 
 
+class Recipient(Schema):
+
+    contact = Related(Contact)
+    handle = fields.Str()
+    role = fields.Str()
+
+
+class Message(Resource, mixins.Readable):
+    class Meta:
+        list_path = 'messages/'
+        detail_path = 'messages/{id}/'
+
+    objects = Manager()
+
+    type = fields.Str()
+    author = fields.Str()
+    blurb = fields.Str()
+    body = fields.Str()
+    created_at = fields.DateTime()
+    id = fields.Str()
+    is_draft = fields.Boolean()
+    is_inbound = fields.Boolean()
+    recipients = fields.Nested(Recipient, many=True)
+    text = fields.Str()
+
+
 class Conversation(Resource, mixins.Readable):
     class Meta:
         list_path = 'conversations/'
@@ -227,13 +253,14 @@ class Conversation(Resource, mixins.Readable):
 
     objects = Manager()
 
+    messages = Related(Message, many=True, sub=True)
     id = fields.Str()
     subject = fields.Str()
     status = fields.Str()
     assignee = fields.Nested('TeammateSchema', allow_none=True)
-    recipient = fields.Nested('ContactSchema')
+    recipient = fields.Nested(Recipient)
     tags = fields.Nested('TagSchema', many=True)
-    # last_message = None  # todo
+    last_message = fields.Nested('MessageSchema')
     created_at = UnixEpochDateTime()
 
 
