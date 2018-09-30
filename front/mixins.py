@@ -22,3 +22,14 @@ class Creatable(object):
             )
         data = client.post(self.Meta.create_path, json=self._raw_data)
         self._set_fields(self._load_raw(data))
+
+
+class Downloadable(object):
+    def download(self):
+        path = self._get_path()
+        return client.get(path, download=True)
+
+    def _get_path(self):
+        if getattr(self, 'id', None) is None:
+            raise ValueError('%s must be saved before it is read' % self)
+        return self.Meta.detail_path.format(id=self.id)

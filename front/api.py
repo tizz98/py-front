@@ -39,12 +39,17 @@ class API(object):
         if kwargs.pop('raw_url', False):
             url = endpoint
 
+        if kwargs.pop('download', False):
+            kwargs['stream']=True
+
         response = requests.request(
             method=method,
             url=url,
             **kwargs
         )
         response.raise_for_status()
+        if 'stream' in kwargs:
+            return response
         return response.json()
 
 

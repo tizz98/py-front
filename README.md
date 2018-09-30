@@ -40,4 +40,10 @@ for conv in front.Conversation.objects.all():
   - https://dev.frontapp.com/#inboxes
 - Teammate
   - https://dev.frontapp.com/#teammates
+- Message
+  - https://dev.frontapp.com/#messages
+- Comment
+  - https://dev.frontapp.com/#comments
+- Attachment
+  - https://dev.frontapp.com/#attachments
 - _More soon..._ PRs are welcome!

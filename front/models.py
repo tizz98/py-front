@@ -68,6 +68,8 @@ class Resource(six.with_metaclass(ResourceMeta)):
 
         if 'inbox' in related:
             self._related[Inbox] = related['inbox']
+        if 'conversation' in related:
+            self._related[Conversation] = related['conversation']
 
     def get_related_url(self, related_cls):
         return self._related[related_cls]
@@ -93,11 +95,12 @@ class Resource(six.with_metaclass(ResourceMeta)):
 
 
 class Related(object):
-    def __init__(self, related_cls, many=False, sub=False, required=False):
+    def __init__(self, related_cls, many=False, sub=False, required=False, list_path=None):
         self._related_cls = related_cls
         self.many = many
         self.sub = sub
         self.required = required
+        self.list_path = list_path
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -105,7 +108,7 @@ class Related(object):
 
         if self.many or self.sub:
             if self.many:
-                list_path = self.related_cls.Meta.list_path
+                list_path = self.list_path or self.related_cls.Meta.list_path
                 response = client.get(instance._get_path() + list_path)
 
                 return ListSet(
@@ -151,6 +154,13 @@ class Manager(object):
 
     def get(self, id):
         instance = self.resource_cls()
+        if not callable(getattr(instance, 'read', None)):
+            raise AttributeError(
+                'Resource {resource_cls} is not readable; '
+                'Use {resource_cls}.objects.download() instead'.format(
+                    resource_cls=type(instance).__name__,
+                )
+            )
         instance.id = id
         instance.read()
         return instance
@@ -170,6 +180,37 @@ class Manager(object):
     def all(self):
         fresh = self._search_cls(resource_cls=self.resource_cls)
         return fresh.all()
+
+    def download(self, id, local_file_path):
+        instance = self.resource_cls()
+        if not callable(getattr(instance, 'download', None)):
+            raise AttributeError(
+                'Resource {resource_cls} is not downloadable; '
+                'Use {resource_cls}.objects.get() instead'.format(
+                    resource_cls=type(instance).__name__,
+                )
+            )
+        instance.id = id
+        r = instance.download()
+        with open(local_file_path, 'wb') as fd:
+            for chunk in r.iter_content(128):
+                fd.write(chunk)
+
+
+class Attachment(Resource, mixins.Downloadable):
+    class Meta:
+        detail_path = 'download/{id}/'
+
+    class Metadata(Schema):
+        is_inline = fields.Boolean()
+        cid = fields.Str()
+
+    objects = Manager()
+
+    filename = fields.Str()
+    content_type = fields.Str()
+    size = fields.Integer()
+    metadata = fields.Nested(Metadata)
 
 
 class Handle(Schema):
@@ -235,15 +276,34 @@ class Message(Resource, mixins.Readable):
     objects = Manager()
 
     type = fields.Str()
-    author = fields.Str()
+    author = fields.Nested('TeammateSchema', allow_none=True)
     blurb = fields.Str()
     body = fields.Str()
-    created_at = fields.DateTime()
+    created_at = UnixEpochDateTime()
     id = fields.Str()
     is_draft = fields.Boolean()
     is_inbound = fields.Boolean()
     recipients = fields.Nested(Recipient, many=True)
     text = fields.Str()
+    attachments = fields.Nested('AttachmentSchema', many=True, allow_none=True)
+
+    conversation = Related('front.Conversation', sub=True)
+
+
+class Comment(Resource, mixins.Readable):
+    class Meta:
+        list_path = 'comments/'
+        detail_path = 'comments/{id}/'
+
+    objects = Manager()
+
+    id = fields.Str()
+    author = fields.Nested('TeammateSchema')
+    body = fields.Str()
+    posted_at = UnixEpochDateTime()
+
+    conversation = Related('front.Conversation')
+    mentions = Related('front.Teammate', many=True, list_path='mentions/')
 
 
 class Conversation(Resource, mixins.Readable):
@@ -253,7 +313,6 @@ class Conversation(Resource, mixins.Readable):
 
     objects = Manager()
 
-    messages = Related(Message, many=True, sub=True)
     id = fields.Str()
     subject = fields.Str()
     status = fields.Str()
@@ -262,6 +321,11 @@ class Conversation(Resource, mixins.Readable):
     tags = fields.Nested('TagSchema', many=True)
     last_message = fields.Nested('MessageSchema')
     created_at = UnixEpochDateTime()
+
+    comments = Related(Comment, many=True)
+    followers = Related('front.Teammate', many=True, list_path='followers/')
+    inboxes = Related('front.Inbox', many=True)
+    messages = Related(Message, many=True)
 
 
 class Inbox(Resource, mixins.Readable, mixins.Creatable):
