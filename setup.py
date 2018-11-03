@@ -17,7 +17,11 @@ setup(
     long_description=open('README.md').read(),
     license="MIT",
     keywords="front api frontapp",
-    install_requires=open('requirements.txt').readlines(),
+    install_requires=[
+        "requests==2.20.0",
+        "marshmallow==2.16.3",
+        "pytz==2018.7",
+    ],
     packages=[
         "front",
     ],
