@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 setup(
@@ -17,12 +17,7 @@ setup(
     long_description=open('README.md').read(),
     license="MIT",
     keywords="front api frontapp",
-    install_requires=[
-        "requests==2.18.4",
-        "marshmallow==2.15.0",
-        "six==1.11.0",
-        "pytz==2017.3",
-    ],
+    install_requires=open('requirements.txt').readlines(),
     packages=[
         "front",
     ],
