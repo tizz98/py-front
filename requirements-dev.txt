@@ -2,3 +2,6 @@
 flake8==3.6.0
 twine==1.12.1
 wheel==0.32.2
+tox==3.5.3
+pytest==3.9.3
+pytest-mock==1.10.0
