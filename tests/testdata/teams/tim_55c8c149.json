@@ -1,0 +1,41 @@
+{
+  "_links": {
+    "self": "https://api2.frontapp.com/teams/tim_55c8c149"
+  },
+  "id": "tim_55c8c149",
+  "name": "Delivery",
+  "inboxes": [
+    {
+      "_links": {
+        "self": "https://api2.frontapp.com/inboxes/inb_55c8c149",
+        "related": {
+          "teammates": "https://api2.frontapp.com/inboxes/inb_55c8c149/teammates",
+          "conversations": "https://api2.frontapp.com/inboxes/inb_55c8c149/conversations",
+          "channels": "https://api2.frontapp.com/inboxes/inb_55c8c149/channels",
+          "owner": "https://api2.frontapp.com/teams/tim_55c8c149"
+        }
+      },
+      "id": "inb_55c8c149",
+      "name": "Team",
+      "is_private": false
+    }
+  ],
+  "members": [
+    {
+      "_links": {
+        "self": "https://api2.frontapp.com/teammates/tea_55c8c149",
+        "related": {
+          "inboxes": "https://api2.frontapp.com/teammates/tea_55c8c149/inboxes",
+          "conversations": "https://api2.frontapp.com/teammates/tea_55c8c149/conversations"
+        }
+      },
+      "id": "tea_55c8c149",
+      "email": "leela@planet-express.com",
+      "username": "leela",
+      "first_name": "Leela",
+      "last_name": "Turanga",
+      "is_admin": true,
+      "is_available": true
+    }
+  ]
+}

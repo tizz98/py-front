@@ -49,7 +49,15 @@ class FrontObject:
     def __getitem__(self, item):
         if item in self._data:
             return self._data[item]
+        elif isinstance(item, int):
+            return self.results[item]
         raise KeyError('no key %r' % item)
+
+    def __iter__(self):
+        return iter(self.results)
+
+    def __len__(self):
+        return len(self.results)
 
     def has_error(self) -> bool:
         return self.error is not None
