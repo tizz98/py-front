@@ -1,6 +1,6 @@
 import abc
 from http.cookiejar import CookieJar
-from typing import Union, TextIO, BinaryIO, List
+from typing import Union, TextIO, BinaryIO, List, Any
 
 import requests
 
@@ -31,8 +31,8 @@ class RequestOptions:
 
     def __init__(
         self,
-        method: str,
-        url: str,
+        method: str = '',
+        url: str = '',
         params: Union[dict, bytes] = _default,
         data: Union[dict, List[tuple], bytes, FileLike] = _default,
         json: dict = _default,
@@ -64,7 +64,18 @@ class RequestOptions:
         self._set_value('stream', stream)
         self._set_value('cert', cert)
 
-    def _set_value(self, attr, value, default=None):
+    def add_parameter(self, name: str, value: Any) -> None:
+        if not self.params:
+            self.params = {}
+
+        if name in self.params:
+            if not isinstance(self.params[name], list):
+                self.params[name] = [self.params[name]]
+            self.params[name].append(value)
+        else:
+            self.params[name] = value
+
+    def _set_value(self, attr: str, value: Any, default: Any = None) -> None:
         if value is self._default:
             value = default
         setattr(self, attr, value)
