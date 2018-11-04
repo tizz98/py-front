@@ -21,3 +21,11 @@ class TestEventRetrieval:
     def test_event_has_type(self, api):
         event = api.event("evt_55c8c149")
         assert event.type == "assign"
+
+    def test_event_has_target_id(self, api):
+        event = api.event("evt_55c8c149")
+        assert event.target.id == "tea_55c8c149"
+
+    def test_event_has_conversation_assignee(self, api):
+        event = api.event("evt_55c8c149")
+        assert event.conversation.assignee.id == "tea_55c8c149"

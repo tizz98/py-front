@@ -38,14 +38,31 @@ def detect_encoding(b):
 
 
 class FrontObject:
+    def __new__(cls, *args, **kwargs):
+        """
+        When the first argument is a dict, create a new front object.
+        Otherwise just return the first argument.
+        """
+        # todo: is there a way to detect timestamps and automatically convert
+        # them to datetime objects?
+        if isinstance(args[0], dict):
+            return super(FrontObject, cls).__new__(cls)
+        return args[0]
+
     def __init__(self, data: dict, api) -> None:
-        self._data = data
+        self._meta = data.pop('_meta', {})
+        self._data = data.pop('data', data)
         self._api = api
         self._pagination = self._data.pop('_pagination', {})
 
         self.links = self._data.pop('_links', {})
-        self.results = self.results = [FrontObject(r, api) for r in self._data.pop('_results', [])]
+        self.results = [FrontObject(r, api) for r in self._data.pop('_results', [])]
         self.error = self._data.pop('_error', None)
+
+        new_data = {}
+        for k, v in self._data.items():
+            new_data[k] = FrontObject(v, api)
+        self._data = new_data
 
     def __getattr__(self, item):
         if item in self._data:
