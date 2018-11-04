@@ -28,5 +28,10 @@ class Api:
         options.method = method
         options.url = urllib.parse.urljoin(self.base_url, endpoint)
 
+        options.headers = (options.headers or {})
+        options.headers.setdefault('Authorization', 'Bearer {}'.format(self._api_key))
+        options.headers.setdefault('Content-Type', 'application/json')
+        options.headers.setdefault('Accept', 'application/json')
+
         resp = self._requester.request(options)
         return FrontObject.from_bytes(resp.content)
