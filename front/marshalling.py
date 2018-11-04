@@ -1,5 +1,9 @@
 import codecs
+from datetime import datetime
 import json
+from typing import Optional
+
+from .exceptions import InvalidTimezoneError
 
 
 # Taken from the json library. Needed for python 3.5 support
@@ -34,11 +38,13 @@ def detect_encoding(b):
 
 
 class FrontObject:
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: dict, api) -> None:
         self._data = data
+        self._api = api
+        self._pagination = self._data.pop('_pagination', {})
 
         self.links = self._data.pop('_links', {})
-        self.results = self.results = [FrontObject(r) for r in self._data.pop('_results', [])]
+        self.results = self.results = [FrontObject(r, api) for r in self._data.pop('_results', [])]
         self.error = self._data.pop('_error', None)
 
     def __getattr__(self, item):
@@ -62,8 +68,32 @@ class FrontObject:
     def has_error(self) -> bool:
         return self.error is not None
 
+    def next_page(self) -> Optional['FrontObject']:
+        next_url = self._pagination.get('next')
+        if next_url is not None:
+            return self._api._request_url('get', next_url)
+        return None
+
+    def has_next_page(self) -> bool:
+        return self.next_page() is not None
+
+    def previous_page(self) -> Optional['FrontObject']:
+        prev_url = self._pagination.get('prev')
+        if prev_url is not None:
+            return self._api._request_url('get', prev_url)
+        return None
+
+    def has_previous_page(self) -> bool:
+        return self.previous_page() is not None
+
     @classmethod
-    def from_bytes(cls, raw: bytes) -> 'FrontObject':
+    def from_bytes(cls, raw: bytes, api) -> 'FrontObject':
         raw = raw.decode(detect_encoding(raw), 'surrogatepass')  # this is to support python 3.5
         data = json.loads(raw)
-        return cls(data)
+        return cls(data, api)
+
+
+def timestamp(dt: datetime) -> float:
+    if dt.tzinfo is None:
+        raise InvalidTimezoneError()
+    return dt.timestamp()

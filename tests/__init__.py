@@ -35,6 +35,7 @@ class RequesterMock(RequesterInterface):
 
     def __init__(self):
         self.r = RequestsRequester()
+        self.calls = []
 
     @responses.activate
     def request(self, options: RequestOptions) -> requests.Response:
@@ -48,4 +49,6 @@ class RequesterMock(RequesterInterface):
             data = json.load(f)
 
         responses.add(options.method.upper(), options.url, json=data)
-        return self.r.request(options)
+        v = self.r.request(options)
+        self.calls = list(responses.calls)
+        return v
