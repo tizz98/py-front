@@ -41,12 +41,15 @@ class FrontObject:
     def __new__(cls, *args, **kwargs):
         """
         When the first argument is a dict, create a new front object.
+        When the first argument is a list, create a new list of front objects.
         Otherwise just return the first argument.
         """
         # todo: is there a way to detect timestamps and automatically convert
         # them to datetime objects?
         if isinstance(args[0], dict):
             return super(FrontObject, cls).__new__(cls)
+        elif isinstance(args[0], list):
+            return [FrontObject(arg, args[1]) for arg in args[0]]
         return args[0]
 
     def __init__(self, data: dict, api) -> None:

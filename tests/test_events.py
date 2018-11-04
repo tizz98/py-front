@@ -29,3 +29,13 @@ class TestEventRetrieval:
     def test_event_has_conversation_assignee(self, api):
         event = api.event("evt_55c8c149")
         assert event.conversation.assignee.id == "tea_55c8c149"
+
+    def test_event_conversation_has_tags(self, api):
+        event = api.event("evt_55c8c149")
+        assert len(event.conversation.tags) == 1
+        assert event.conversation.tags[0].id == "tag_55c8c149"
+
+    def test_event_source_has_actions(self, api):
+        event = api.event("evt_55c8c149")
+        assert len(event.source.actions) == 1
+        assert event.source.actions[0] == "Assign to Leela Turanga"
