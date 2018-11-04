@@ -14,6 +14,12 @@ class Api:
     def me(self, options: RequestOptions = None):
         return self._get('me', options)
 
+    def teams(self, options: RequestOptions = None):
+        return self._get('teams', options)
+
+    def team(self, team_id: str, options: RequestOptions = None):
+        return self._get('teams/{id}'.format(id=team_id), options)
+
     def _get(self, url, options: RequestOptions = None):
         return self._request('get', url, options)
 
