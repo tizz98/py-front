@@ -52,3 +52,72 @@ class TestAttachments:
 
         assert 'Content-Type' not in headers
         assert 'Accept' not in headers
+
+
+class TestConversationInboxListing:
+    def test_inbox_has_id(self, api):
+        inboxes = api.conversation_inboxes("cnv_55c8c149")
+        assert inboxes[0].id == "inb_55c8c149"
+
+    def test_inbox_has_name(self, api):
+        inboxes = api.conversation_inboxes("cnv_55c8c149")
+        assert inboxes[0].name == "Team"
+
+    def test_inbox_has_is_private(self, api):
+        inboxes = api.conversation_inboxes("cnv_55c8c149")
+        assert inboxes[0].is_private is False
+
+    def test_inboxes_are_iterable(self, api):
+        inboxes = api.conversation_inboxes("cnv_55c8c149")
+        assert len(inboxes) == 1
+        assert list(inboxes)
+
+
+class TestConversationFollowerListing:
+    def test_follower_has_id(self, api):
+        followers = api.conversation_followers("cnv_55c8c149")
+        assert followers[0].id == "tea_55c8c149"
+
+    def test_follower_has_username(self, api):
+        followers = api.conversation_followers("cnv_55c8c149")
+        assert followers[0].username == "leela"
+
+    def test_followers_are_iterable(self, api):
+        followers = api.conversation_followers("cnv_55c8c149")
+        assert len(followers) == 1
+        assert list(followers)
+
+
+class TestConversationEventListing:
+    def test_event_has_id(self, api):
+        events = api.conversation_events("cnv_55c8c149")
+        assert events[0].id == "evt_55c8c149"
+
+    def test_event_has_type(self, api):
+        events = api.conversation_events("cnv_55c8c149")
+        assert events[0].type == "assign"
+
+    def test_event_has_target(self, api):
+        events = api.conversation_events("cnv_55c8c149")
+        assert events[0].target._meta['type'] == "teammate"
+        assert events[0].target.id == "tea_55c8c149"
+
+    def test_events_are_iterable(self, api):
+        events = api.conversation_events("cnv_55c8c149")
+        assert len(events) == 1
+        assert list(events)
+
+
+class TestConversationMessageListing:
+    def test_message_has_id(self, api):
+        messages = api.conversation_messages("cnv_55c8c149")
+        assert messages[0].id == "msg_55c8c149"
+
+    def test_message_has_blurb(self, api):
+        messages = api.conversation_messages("cnv_55c8c149")
+        assert messages[0].blurb == "Anything less than immortality is a..."
+
+    def test_messages_are_iterable(self, api):
+        messages = api.conversation_messages("cnv_55c8c149")
+        assert len(messages) == 1
+        assert list(messages)

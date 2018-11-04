@@ -76,6 +76,18 @@ class Api:
             for chunk in resp.iter_content(chunk_size=128):
                 f.write(chunk)
 
+    def conversation_inboxes(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/inboxes'.format(id=conversation_id), options=options)
+
+    def conversation_followers(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/followers'.format(id=conversation_id), options=options)
+
+    def conversation_events(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/events'.format(id=conversation_id), options=options)
+
+    def conversation_messages(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/messages'.format(id=conversation_id), options=options)
+
     def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
