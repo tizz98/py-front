@@ -17,7 +17,7 @@ class TestAddSearchParameters:
 
     def test_lists_are_added_correctly_to_request(self, api):
         search = ConversationSearchParameters(statuses=[Status.ARCHIVED, Status.ASSIGNED])
-        api._request_endpoint('get', 'me', search)
+        api._request_endpoint('get', 'me', search=search)
 
         url = api._requester.calls[0].request.url
         parsed = urllib.parse.urlparse(url)
