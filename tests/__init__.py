@@ -43,12 +43,19 @@ class RequesterMock(RequesterInterface):
             raise RuntimeError('unsupported method: %r' % options.method)
 
         parsed = urllib.parse.urlparse(options.url)
-        path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/') + '.json')
+        path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/'))
 
-        with open(path) as f:
-            data = json.load(f)
+        if os.path.exists(path + '.json'):
+            with open(path + '.json') as f:
+                data = json.load(f)
 
-        responses.add(options.method.upper(), options.url, json=data)
+            responses.add(options.method.upper(), options.url, json=data)
+        elif os.path.exists(path):
+            with open(path, 'rb') as f:
+                data = f.read()
+
+            responses.add(options.method.upper(), options.url, body=data)
+
         v = self.r.request(options)
         self.calls = list(responses.calls)
         return v

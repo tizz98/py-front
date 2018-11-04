@@ -3,6 +3,8 @@ from enum import Enum
 from typing import NamedTuple, List, Union, Optional, Any
 import urllib.parse
 
+import requests
+
 from .marshalling import FrontObject, timestamp
 from .requests import RequestsRequester, RequestOptions
 
@@ -66,6 +68,14 @@ class Api:
     def conversation(self, conversation_id: str, options: RequestOptions = None):
         return self._get('conversations/{id}'.format(id=conversation_id), options=options)
 
+    def download_attachment(self, attachment_url: str, download_path: str) -> None:
+        options = RequestOptions(headers={'Content-Type': None, 'Accept': None})
+        resp = self._raw_request('get', attachment_url, options=options)
+
+        with open(download_path, 'wb+') as f:
+            for chunk in resp.iter_content(chunk_size=128):
+                f.write(chunk)
+
     def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -85,6 +95,16 @@ class Api:
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
+        resp = self._raw_request(method, url, search=search, options=options)
+        return FrontObject.from_bytes(resp.content, self)
+
+    def _raw_request(
+        self,
+        method: str,
+        url: str,
+        search: SearchParameters = None,
+        options: RequestOptions = None,
+    ) -> requests.Response:
         options = options or RequestOptions()
         options.method = method
         options.url = url
@@ -96,8 +116,7 @@ class Api:
         options.headers.setdefault('Content-Type', 'application/json')
         options.headers.setdefault('Accept', 'application/json')
 
-        resp = self._requester.request(options)
-        return FrontObject.from_bytes(resp.content, self)
+        return self._requester.request(options)
 
 
 def add_search_parameters(search: Optional[SearchParameters], options: RequestOptions) -> RequestOptions:

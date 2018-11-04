@@ -31,3 +31,13 @@ class TestAddSearchParameters:
 
         opts = add_search_parameters(search, opts)
         assert opts.params == {'before': 1514764800}
+
+
+class TestRequests:
+    def test_headers_are_added(self, api):
+        api.me()
+        headers = api._requester.calls[0].request.headers
+
+        assert headers['Authorization']
+        assert headers['Content-Type']
+        assert headers['Accept']
