@@ -1,10 +1,3 @@
 # flake8: noqa
-from .api import set_api_key
-from .models import (
-    Channel,
-    Contact,
-    Conversation,
-    Inbox,
-    Tag,
-    Teammate,
-)
+from .api import Api
+from .requests import RequestOptions

@@ -21,6 +21,7 @@ setup(
         "requests==2.20.0",
         "marshmallow==2.16.3",
         "pytz==2018.7",
+        "pyjwt==1.6.4",
     ],
     packages=[
         "front",

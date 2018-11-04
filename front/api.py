@@ -1,55 +1,26 @@
-import requests
+import urllib.parse
 
-from front import exceptions
-
-
-class API(object):
-    base_url = 'https://api2.frontapp.com/'
-
-    def __init__(self):
-        self.jwt_key = None
-
-    def set_key(self, key):
-        self.jwt_key = key
-
-    @property
-    def _headers(self):
-        return {
-            'Authorization': 'Bearer {}'.format(self.jwt_key),
-            'Content-Type': 'application/json',
-        }
-
-    def get(self, endpoint, params=None, **kwargs):
-        return self._request('get', endpoint, params=params, **kwargs)
-
-    def put(self, endpoint, data=None, json=None, **kwargs):
-        return self._request('put', endpoint, data=data, json=json, **kwargs)
-
-    def _request(self, method, endpoint, **kwargs):
-        if self.jwt_key is None:
-            raise exceptions.AuthenticationError(
-                '`front.set_api_key` must be called before making api calls'
-            )
-
-        kwargs.setdefault('headers', {})
-        kwargs['headers'].update(self._headers)
-
-        url = '{}{}'.format(self.base_url, endpoint)
-
-        if kwargs.pop('raw_url', False):
-            url = endpoint
-
-        response = requests.request(
-            method=method,
-            url=url,
-            **kwargs
-        )
-        response.raise_for_status()
-        return response.json()
+from .marshalling import FrontObject
+from .requests import RequestsRequester, RequestOptions
 
 
-client = API()
+class Api:
+    base_url = 'https://api2.frontapp.com'
 
+    def __init__(self, api_key: str) -> None:
+        self._api_key = api_key
+        self._requester = RequestsRequester()
 
-def set_api_key(key):
-    client.set_key(key)
+    def me(self, options: RequestOptions = None):
+        return self._get('me', options)
+
+    def _get(self, url, options: RequestOptions = None):
+        return self._request('get', url, options)
+
+    def _request(self, method, endpoint, options: RequestOptions = None) -> FrontObject:
+        options = options or RequestOptions('', '')
+        options.method = method
+        options.url = urllib.parse.urljoin(self.base_url, endpoint)
+
+        resp = self._requester.request(options)
+        return FrontObject.from_bytes(resp.content)
