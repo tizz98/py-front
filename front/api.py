@@ -56,9 +56,12 @@ class Api:
         self,
         topic_id: str,
         search: ConversationSearchParameters = None,
-        options: RequestOptions = None
+        options: RequestOptions = None,
     ):
         return self._get('topics/{id}/conversations'.format(id=topic_id), search=search, options=options)
+
+    def conversations(self, search: ConversationSearchParameters = None, options: RequestOptions = None):
+        return self._get('conversations', search=search, options=options)
 
     def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
