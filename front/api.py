@@ -38,30 +38,38 @@ class Api:
         self._requester = RequestsRequester()
 
     def me(self, options: RequestOptions = None):
-        return self._get('me', options)
+        return self._get('me', options=options)
 
     def teams(self, options: RequestOptions = None):
-        return self._get('teams', options)
+        return self._get('teams', options=options)
 
     def team(self, team_id: str, options: RequestOptions = None):
-        return self._get('teams/{id}'.format(id=team_id), options)
+        return self._get('teams/{id}'.format(id=team_id), options=options)
 
-    def _get(self, endpoint: str, options: RequestOptions = None):
-        return self._request_endpoint('get', endpoint, options)
+    def events(self, search: EventSearchParameters = None, options: RequestOptions = None):
+        return self._get('events', search=search, options=options)
+
+    def event(self, event_id: str, options: RequestOptions = None):
+        return self._get('events/{id}'.format(id=event_id), options=options)
+
+    def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
+        return self._request_endpoint('get', endpoint, search=search, options=options)
 
     def _request_endpoint(
         self,
         method: str,
         endpoint: str,
+        *,
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
-        return self._request_url(method, urllib.parse.urljoin(self.base_url, endpoint), search, options)
+        return self._request_url(method, urllib.parse.urljoin(self.base_url, endpoint), search=search, options=options)
 
     def _request_url(
         self,
         method: str,
         url: str,
+        *,
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
