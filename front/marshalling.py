@@ -107,9 +107,12 @@ class FrontObject:
         return self.previous_page() is not None
 
     @classmethod
-    def from_bytes(cls, raw: bytes, api) -> 'FrontObject':
+    def from_bytes(cls, raw: bytes, api) -> Optional['FrontObject']:
         raw = raw.decode(detect_encoding(raw), 'surrogatepass')  # this is to support python 3.5
-        data = json.loads(raw)
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            return None
         return cls(data, api)
 
 

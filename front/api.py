@@ -3,6 +3,8 @@ from enum import Enum
 from typing import NamedTuple, List, Union, Optional, Any
 import urllib.parse
 
+import requests
+
 from .marshalling import FrontObject, timestamp
 from .requests import RequestsRequester, RequestOptions
 
@@ -56,12 +58,47 @@ class Api:
         self,
         topic_id: str,
         search: ConversationSearchParameters = None,
-        options: RequestOptions = None
+        options: RequestOptions = None,
     ):
         return self._get('topics/{id}/conversations'.format(id=topic_id), search=search, options=options)
 
-    def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
+    def conversations(self, search: ConversationSearchParameters = None, options: RequestOptions = None):
+        return self._get('conversations', search=search, options=options)
+
+    def conversation(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}'.format(id=conversation_id), options=options)
+
+    def download_attachment(self, attachment_url: str, download_path: str) -> None:
+        options = RequestOptions(headers={'Content-Type': None, 'Accept': None})
+        resp = self._raw_request('get', attachment_url, options=options)
+
+        with open(download_path, 'wb+') as f:
+            for chunk in resp.iter_content(chunk_size=128):
+                f.write(chunk)
+
+    def conversation_inboxes(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/inboxes'.format(id=conversation_id), options=options)
+
+    def conversation_followers(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/followers'.format(id=conversation_id), options=options)
+
+    def conversation_events(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/events'.format(id=conversation_id), options=options)
+
+    def conversation_messages(self, conversation_id: str, options: RequestOptions = None):
+        return self._get('conversations/{id}/messages'.format(id=conversation_id), options=options)
+
+    def update_conversation(self, conversation_id: str, updates: dict, options: RequestOptions = None):
+        return self._patch('conversations/{id}'.format(id=conversation_id), updates=updates, options=options)
+
+    def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
+
+    def _patch(self, endpoint: str, updates: dict, options: RequestOptions = None):
+        options = options or RequestOptions()
+        options.json = updates
+
+        return self._request_endpoint('patch', endpoint, options=options)
 
     def _request_endpoint(
         self,
@@ -79,6 +116,16 @@ class Api:
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
+        resp = self._raw_request(method, url, search=search, options=options)
+        return FrontObject.from_bytes(resp.content, self)
+
+    def _raw_request(
+        self,
+        method: str,
+        url: str,
+        search: SearchParameters = None,
+        options: RequestOptions = None,
+    ) -> requests.Response:
         options = options or RequestOptions()
         options.method = method
         options.url = url
@@ -90,8 +137,7 @@ class Api:
         options.headers.setdefault('Content-Type', 'application/json')
         options.headers.setdefault('Accept', 'application/json')
 
-        resp = self._requester.request(options)
-        return FrontObject.from_bytes(resp.content, self)
+        return self._requester.request(options)
 
 
 def add_search_parameters(search: Optional[SearchParameters], options: RequestOptions) -> RequestOptions:

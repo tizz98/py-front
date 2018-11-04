@@ -31,6 +31,7 @@ TESTDATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'testdata
 class RequesterMock(RequesterInterface):
     _allowed_methods = {
         'get',
+        'patch',
     }
 
     def __init__(self):
@@ -42,13 +43,23 @@ class RequesterMock(RequesterInterface):
         if options.method not in self._allowed_methods:
             raise RuntimeError('unsupported method: %r' % options.method)
 
-        parsed = urllib.parse.urlparse(options.url)
-        path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/') + '.json')
+        if options.method == 'get':
+            parsed = urllib.parse.urlparse(options.url)
+            path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/'))
 
-        with open(path) as f:
-            data = json.load(f)
+            if os.path.exists(path + '.json'):
+                with open(path + '.json') as f:
+                    data = json.load(f)
 
-        responses.add(options.method.upper(), options.url, json=data)
+                responses.add(options.method.upper(), options.url, json=data)
+            elif os.path.exists(path):
+                with open(path, 'rb') as f:
+                    data = f.read()
+
+                responses.add(options.method.upper(), options.url, body=data)
+        elif options.method == 'patch':
+            responses.add(options.method.upper(), options.url, status=204)
+
         v = self.r.request(options)
         self.calls = list(responses.calls)
         return v
