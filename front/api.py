@@ -88,8 +88,17 @@ class Api:
     def conversation_messages(self, conversation_id: str, options: RequestOptions = None):
         return self._get('conversations/{id}/messages'.format(id=conversation_id), options=options)
 
-    def _get(self, endpoint: str, *, search: EventSearchParameters = None, options: RequestOptions = None):
+    def update_conversation(self, conversation_id: str, updates: dict, options: RequestOptions = None):
+        return self._patch('conversations/{id}'.format(id=conversation_id), updates=updates, options=options)
+
+    def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
+
+    def _patch(self, endpoint: str, updates: dict, options: RequestOptions = None):
+        options = options or RequestOptions()
+        options.json = updates
+
+        return self._request_endpoint('patch', endpoint, options=options)
 
     def _request_endpoint(
         self,

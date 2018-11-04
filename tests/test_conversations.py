@@ -1,4 +1,8 @@
+import json
 import tempfile
+
+from front.api import Status
+from front.marshalling import detect_encoding
 
 
 class TestConversationListing:
@@ -121,3 +125,34 @@ class TestConversationMessageListing:
         messages = api.conversation_messages("cnv_55c8c149")
         assert len(messages) == 1
         assert list(messages)
+
+
+class TestConversationUpdating:
+    def test_http_method_is_correct(self, api):
+        api.update_conversation("cnv_55c8c149", updates={
+            "assignee_id": "tea_55c8c149",
+            "inbox_id": "inb_128yew",
+            "status": Status.DELETED.value,
+            "tags": ["fun", "delivery"],
+        })
+
+        req = api._requester.calls[0].request
+
+        assert req.method == 'PATCH'
+
+    def test_json_body_is_correct(self, api):
+        api.update_conversation("cnv_55c8c149", updates={
+            "assignee_id": "tea_55c8c149",
+            "inbox_id": "inb_128yew",
+            "status": Status.DELETED.value,
+            "tags": ["fun", "delivery"],
+        })
+
+        req = api._requester.calls[0].request
+
+        assert json.loads(req.body.decode(detect_encoding(req.body), 'surrogatepass')) == {
+            "assignee_id": "tea_55c8c149",
+            "inbox_id": "inb_128yew",
+            "status": Status.DELETED.value,
+            "tags": ["fun", "delivery"],
+        }
