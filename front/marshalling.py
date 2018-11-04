@@ -24,5 +24,6 @@ class FrontObject:
 
     @classmethod
     def from_bytes(cls, raw: bytes) -> 'FrontObject':
+        raw = raw.decode(json.detect_encoding(raw), 'surrogatepass')  # this is to support python 3.5
         data = json.loads(raw)
         return cls(data)
