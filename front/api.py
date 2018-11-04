@@ -59,7 +59,6 @@ class Api:
         self,
         method: str,
         endpoint: str,
-        *,
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
@@ -69,7 +68,6 @@ class Api:
         self,
         method: str,
         url: str,
-        *,
         search: SearchParameters = None,
         options: RequestOptions = None,
     ) -> FrontObject:
