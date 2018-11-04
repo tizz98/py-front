@@ -38,6 +38,6 @@ class TestRequests:
         api.me()
         headers = api._requester.calls[0].request.headers
 
-        assert headers['Authorization']
-        assert headers['Content-Type']
-        assert headers['Accept']
+        assert headers['Authorization'].startswith('Bearer')
+        assert headers['Content-Type'] == 'application/json'
+        assert headers['Accept'] == 'application/json'
