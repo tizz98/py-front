@@ -50,3 +50,7 @@ class TestAnalyticsRetrieval:
         given_parts = sorted(query.split('&'))
 
         assert expected_parts == given_parts
+
+    def test_by_team_id(self, api):
+        analytics = api.analytics(params, team_id="tim_55c8c149")
+        assert analytics.status == "pending"

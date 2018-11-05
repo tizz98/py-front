@@ -4,7 +4,8 @@ from datetime import datetime
 import pytz
 
 from front import RequestOptions
-from front.api import ConversationSearchParameters, EventSearchParameters, ContactSearchParameters, Status, add_search_parameters
+from front.api import ConversationSearchParameters, EventSearchParameters, \
+    ContactSearchParameters, Status, add_search_parameters, add_parameters
 
 
 class TestAddSearchParameters:
@@ -59,6 +60,20 @@ class TestAddSearchParameters:
             'q[updated_before]': 1517443200,
             'q[updated_after]': 1514764800,
         }
+
+
+class TestAddParameters:
+    def test_when_params_are_none_options_are_not_updated(self):
+        opts = RequestOptions()
+        add_parameters(None, opts)
+
+        assert opts.params is None
+
+    def test_when_value_is_none_it_is_not_set(self):
+        opts = RequestOptions()
+        add_parameters({'foo': None}, opts)
+
+        assert opts.params is None
 
 
 class TestRequests:
