@@ -120,6 +120,17 @@ class Api:
     def update_teammate(self, teammate_id: str, updates: dict, options: RequestOptions = None):
         return self._patch('teammates/{id}'.format(id=teammate_id), updates=updates, options=options)
 
+    def teammate_conversations(
+        self,
+        teammate_id: str,
+        search: ConversationSearchParameters = None,
+        options: RequestOptions = None,
+    ):
+        return self._get('teammates/{id}/conversations'.format(id=teammate_id), search=search, options=options)
+
+    def teammate_inboxes(self, teammate_id: str, options: RequestOptions = None):
+        return self._get('teammates/{id}/inboxes'.format(id=teammate_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 

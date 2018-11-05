@@ -60,3 +60,33 @@ class TestTeammateUpdate:
             "is_admin": True,
             "is_available": False,
         }
+
+
+class TestTeammateConversationListing:
+    def test_conversation_has_id(self, api):
+        convos = api.teammate_conversations("tea_55c8c149")
+        assert convos[0].id == "cnv_55c8c149"
+
+    def test_conversation_has_subject(self, api):
+        convos = api.teammate_conversations("tea_55c8c149")
+        assert convos[0].subject == "You broke my heart, Hubert."
+
+    def test_conversations_are_iterable(self, api):
+        convos = api.teammate_conversations("tea_55c8c149")
+        assert len(convos) == 1
+        assert list(convos)
+
+
+class TestTeammateInboxListing:
+    def test_inbox_has_id(self, api):
+        inboxes = api.teammate_inboxes("tea_55c8c149")
+        assert inboxes[0].id == "inb_55c8c149"
+
+    def test_inbox_has_name(self, api):
+        inboxes = api.teammate_inboxes("tea_55c8c149")
+        assert inboxes[0].name == "Team"
+
+    def test_inboxes_are_iterable(self, api):
+        inboxes = api.teammate_inboxes("tea_55c8c149")
+        assert len(inboxes) == 1
+        assert list(inboxes)
