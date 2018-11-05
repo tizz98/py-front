@@ -1,0 +1,57 @@
+{
+  "status": "pending",
+  "progress": 42,
+  "metrics": [
+    {
+      "id": "avg_conversations_per_day",
+      "metric_type": "scalar",
+      "t": "num",
+      "v": 42,
+      "p": 24
+    },
+    {
+      "id": "first_response_histo",
+      "metric_type": "table",
+      "columns": [
+        {
+          "id": "time",
+          "label": "Time",
+          "type": "num"
+        },
+        {
+          "id": "pct_replies",
+          "label": "Replies %",
+          "type": "num"
+        }
+      ],
+      "rows": [
+        [
+          {
+            "t": "str",
+            "v": "< 15mn",
+            "p": "< 15mn"
+          },
+          {
+            "t": "pct",
+            "v": "12",
+            "p": "50"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "first_response_graph",
+      "metric_type: `time_graph`": "",
+      "vals": [
+        {
+          "t": "dur",
+          "v": 42,
+          "p": 24,
+          "label": "January",
+          "start": 1451785860,
+          "end": 1454464260
+        }
+      ]
+    }
+  ]
+}

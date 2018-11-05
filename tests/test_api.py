@@ -4,17 +4,11 @@ from datetime import datetime
 import pytz
 
 from front import RequestOptions
-from front.api import ConversationSearchParameters, EventSearchParameters, Status, add_search_parameters
+from front.api import ConversationSearchParameters, EventSearchParameters, \
+    ContactSearchParameters, Status, add_search_parameters, add_parameters
 
 
 class TestAddSearchParameters:
-    def test_lists_are_added_correctly_to_options(self):
-        opts = RequestOptions()
-        search = ConversationSearchParameters(statuses=[Status.ARCHIVED, Status.ASSIGNED])
-
-        opts = add_search_parameters(search, opts)
-        assert opts.params == {'q[statuses][]': ['archived', 'assigned']}
-
     def test_lists_are_added_correctly_to_request(self, api):
         search = ConversationSearchParameters(statuses=[Status.ARCHIVED, Status.ASSIGNED])
         api._request_endpoint('get', 'me', search=search)
@@ -29,8 +23,57 @@ class TestAddSearchParameters:
         opts = RequestOptions()
         search = EventSearchParameters(before=datetime(2018, 1, 1, tzinfo=pytz.utc), after=None, types=None)
 
-        opts = add_search_parameters(search, opts)
-        assert opts.params == {'before': 1514764800}
+        add_search_parameters(search, opts)
+        assert opts.params == {'q[before]': 1514764800}
+
+    def test_conversation_search_parameters(self):
+        opts = RequestOptions()
+        search = ConversationSearchParameters(statuses=[Status.ARCHIVED, Status.ASSIGNED])
+
+        add_search_parameters(search, opts)
+        assert opts.params == {'q[statuses][]': ['archived', 'assigned']}
+
+    def test_event_search_parameters(self):
+        opts = RequestOptions()
+        search = EventSearchParameters(
+            before=datetime(2018, 2, 1, tzinfo=pytz.utc),
+            after=datetime(2018, 1, 1, tzinfo=pytz.utc),
+            types=['foo', 'bar'],
+        )
+
+        add_search_parameters(search, opts)
+        assert opts.params == {
+            'q[before]': 1517443200,
+            'q[after]': 1514764800,
+            'q[types][]': ['foo', 'bar'],
+        }
+
+    def test_contact_search_parameters(self):
+        opts = RequestOptions()
+        search = ContactSearchParameters(
+            updated_before=datetime(2018, 2, 1, tzinfo=pytz.utc),
+            updated_after=datetime(2018, 1, 1, tzinfo=pytz.utc),
+        )
+
+        add_search_parameters(search, opts)
+        assert opts.params == {
+            'q[updated_before]': 1517443200,
+            'q[updated_after]': 1514764800,
+        }
+
+
+class TestAddParameters:
+    def test_when_params_are_none_options_are_not_updated(self):
+        opts = RequestOptions()
+        add_parameters(None, opts)
+
+        assert opts.params is None
+
+    def test_when_value_is_none_it_is_not_set(self):
+        opts = RequestOptions()
+        add_parameters({'foo': None}, opts)
+
+        assert opts.params is None
 
 
 class TestRequests:

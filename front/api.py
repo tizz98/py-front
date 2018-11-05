@@ -31,6 +31,15 @@ ContactSearchParameters = NamedTuple('ContactSearchParameters', (
 
 SearchParameters = Union[ConversationSearchParameters, EventSearchParameters, ContactSearchParameters]
 
+AnalyticsParameters = NamedTuple('AnalyticsParameters', (
+    ('inbox_ids', Optional[List[str]]),
+    ('tag_ids', Optional[List[str]]),
+    ('start', datetime),
+    ('end', datetime),
+    ('timezone', Optional[str]),
+    ('metrics', List[str]),
+))
+
 
 class Api:
     base_url = 'https://api2.frontapp.com'
@@ -91,6 +100,17 @@ class Api:
     def update_conversation(self, conversation_id: str, updates: dict, options: RequestOptions = None):
         return self._patch('conversations/{id}'.format(id=conversation_id), updates=updates, options=options)
 
+    def analytics(self, params: AnalyticsParameters, team_id: Optional[str] = None, options: RequestOptions = None):
+        endpoint = 'analytics'
+
+        options = options or RequestOptions()
+        add_parameters(params._asdict(), options)
+
+        if team_id is not None:
+            endpoint = 'teams/{id}/analytics'.format(id=team_id)
+
+        return self._get(endpoint, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -140,23 +160,35 @@ class Api:
         return self._requester.request(options)
 
 
-def add_search_parameters(search: Optional[SearchParameters], options: RequestOptions) -> RequestOptions:
-    if search is None:
-        return options
+def add_search_parameters(params: Optional[SearchParameters], options: RequestOptions) -> None:
+    if params is not None:
+        add_parameters({'q': params._asdict()}, options)
 
-    for k, v in search._asdict().items():
+
+def add_parameters(params: Optional[dict], options: RequestOptions) -> None:
+    if params is None:
+        return
+
+    for k, v in params.items():
         v = _front_parameter_value(v)
 
         if isinstance(v, list):
             for item in v:
-                options.add_parameter('q[{}][]'.format(k), item)
+                options.add_parameter('{}[]'.format(k), item)
+            continue
+        elif isinstance(v, dict):
+            for vk, vv in v.items():
+                key = '{}[{}]'.format(k, vk)
+                if isinstance(vv, list):
+                    key = key + '[]'
+                elif vv is None:
+                    continue
+                options.add_parameter(key, vv)
             continue
         elif v is None:
             continue
 
         options.add_parameter(k, v)
-
-    return options
 
 
 def _front_parameter_value(value: Any) -> Any:
@@ -166,4 +198,6 @@ def _front_parameter_value(value: Any) -> Any:
         return value.value
     elif isinstance(value, list):
         return list(map(_front_parameter_value, value))
+    elif isinstance(value, dict):
+        return {k: _front_parameter_value(v) for k, v in value.items()}
     return value

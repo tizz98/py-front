@@ -57,6 +57,8 @@ class RequesterMock(RequesterInterface):
                     data = f.read()
 
                 responses.add(options.method.upper(), options.url, body=data)
+            else:
+                raise RuntimeError('no file found. Tried: {!r} and {!r}'.format(path, path + '.json'))
         elif options.method == 'patch':
             responses.add(options.method.upper(), options.url, status=204)
 
