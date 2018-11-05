@@ -111,6 +111,12 @@ class Api:
 
         return self._get(endpoint, options=options)
 
+    def teammates(self, options: RequestOptions = None):
+        return self._get('teammates', options=options)
+
+    def teammate(self, teammate_id: str, options: RequestOptions = None):
+        return self._get('teammates/{id}'.format(id=teammate_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
