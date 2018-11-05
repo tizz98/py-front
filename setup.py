@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-__version__ = "0.0.5"
+__version__ = "2.0.0"
 
 
 setup(
@@ -33,6 +33,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     zip_safe=True,
 )
