@@ -32,6 +32,7 @@ class RequesterMock(RequesterInterface):
     _allowed_methods = {
         'get',
         'patch',
+        'post',
     }
 
     def __init__(self):
@@ -43,10 +44,10 @@ class RequesterMock(RequesterInterface):
         if options.method not in self._allowed_methods:
             raise RuntimeError('unsupported method: %r' % options.method)
 
-        if options.method == 'get':
-            parsed = urllib.parse.urlparse(options.url)
-            path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/'))
+        parsed = urllib.parse.urlparse(options.url)
+        path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/'))
 
+        if options.method == 'get':
             if os.path.exists(path + '.json'):
                 with open(path + '.json') as f:
                     data = json.load(f)
@@ -61,6 +62,15 @@ class RequesterMock(RequesterInterface):
                 raise RuntimeError('no file found. Tried: {!r} and {!r}'.format(path, path + '.json'))
         elif options.method == 'patch':
             responses.add(options.method.upper(), options.url, status=204)
+        elif options.method == 'post':
+            data = None
+            post_path = os.path.join(path, '_post.json')
+
+            if os.path.exists(post_path):
+                with open(post_path) as f:
+                    data = json.load(f)
+
+            responses.add(options.method.upper(), options.url, json=data, status=201)
 
         v = self.r.request(options)
         self.calls = list(responses.calls)
