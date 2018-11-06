@@ -93,12 +93,45 @@ class TestInboxRetrieval:
 
 
 class TestInboxChannelListing:
-    pass
+    def test_channel_has_id(self, api):
+        channels = api.inbox_channels("inb_55c8c149")
+        assert channels[0].id == "cha_55c8c149"
+
+    def test_channel_has_type(self, api):
+        channels = api.inbox_channels("inb_55c8c149")
+        assert channels[0].type == "smtp"
+
+    def test_channels_are_iterable(self, api):
+        channels = api.inbox_channels("inb_55c8c149")
+        assert len(channels) == 1
+        assert list(channels)
 
 
 class TestInboxConversationListing:
-    pass
+    def test_conversation_has_id(self, api):
+        convos = api.inbox_conversations("inb_55c8c149")
+        assert convos[0].id == "cnv_55c8c149"
+
+    def test_conversation_has_status(self, api):
+        convos = api.inbox_conversations("inb_55c8c149")
+        assert convos[0].status == "archived"
+
+    def test_conversations_are_iterable(self, api):
+        convos = api.inbox_conversations("inb_55c8c149")
+        assert len(convos) == 1
+        assert list(convos)
 
 
 class TestInboxTeammateListing:
-    pass
+    def test_teammate_has_id(self, api):
+        teammates = api.inbox_teammates("inb_55c8c149")
+        assert teammates[0].id == "tea_55c8c149"
+
+    def test_teammate_has_email(self, api):
+        teammates = api.inbox_teammates("inb_55c8c149")
+        assert teammates[0].email == "leela@planet-express.com"
+
+    def test_teammates_are_iterable(self, api):
+        teammates = api.inbox_teammates("inb_55c8c149")
+        assert len(teammates) == 1
+        assert list(teammates)

@@ -149,6 +149,24 @@ class Api:
     def inbox(self, inbox_id: str, options: RequestOptions = None):
         return self._get('inboxes/{id}'.format(id=inbox_id), options=options)
 
+    def inbox_channels(self, inbox_id: str, options: RequestOptions = None):
+        return self._get('inboxes/{id}/channels'.format(id=inbox_id), options=options)
+
+    def inbox_conversations(
+        self,
+        inbox_id: str,
+        search: ConversationSearchParameters = None,
+        options: RequestOptions = None,
+    ):
+        return self._get(
+            'inboxes/{id}/conversations'.format(id=inbox_id),
+            search=search,
+            options=options,
+        )
+
+    def inbox_teammates(self, inbox_id: str, options: RequestOptions = None):
+        return self._get('inboxes/{id}/teammates'.format(id=inbox_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
