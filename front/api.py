@@ -131,6 +131,12 @@ class Api:
     def teammate_inboxes(self, teammate_id: str, options: RequestOptions = None):
         return self._get('teammates/{id}/inboxes'.format(id=teammate_id), options=options)
 
+    def inboxes(self, options: RequestOptions = None):
+        return self._get('inboxes', options=options)
+
+    def team_inboxes(self, team_id: str, options: RequestOptions = None):
+        return self._get('teams/{id}/inboxes'.format(id=team_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 

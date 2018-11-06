@@ -32,6 +32,7 @@ class RequesterMock(RequesterInterface):
     _allowed_methods = {
         'get',
         'patch',
+        'post',
     }
 
     def __init__(self):
@@ -61,6 +62,8 @@ class RequesterMock(RequesterInterface):
                 raise RuntimeError('no file found. Tried: {!r} and {!r}'.format(path, path + '.json'))
         elif options.method == 'patch':
             responses.add(options.method.upper(), options.url, status=204)
+        elif options.method == 'post':
+            responses.add(options.method.upper(), options.url, status=201)
 
         v = self.r.request(options)
         self.calls = list(responses.calls)

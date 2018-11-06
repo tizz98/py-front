@@ -1,0 +1,21 @@
+{
+  "_links": {
+    "self": "https://api2.frontapp.com/teams/tim_55c8c149/inboxes"
+  },
+  "_results": [
+    {
+      "_links": {
+        "self": "https://api2.frontapp.com/inboxes/inb_55c8c149",
+        "related": {
+          "teammates": "https://api2.frontapp.com/inboxes/inb_55c8c149/teammates",
+          "conversations": "https://api2.frontapp.com/inboxes/inb_55c8c149/conversations",
+          "channels": "https://api2.frontapp.com/inboxes/inb_55c8c149/channels",
+          "owner": "https://api2.frontapp.com/teams/tim_55c8c149"
+        }
+      },
+      "id": "inb_55c8c149",
+      "name": "Team",
+      "is_private": false
+    }
+  ]
+}
