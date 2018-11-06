@@ -83,7 +83,13 @@ class TestInboxCreation:
 
 
 class TestInboxRetrieval:
-    pass
+    def test_inbox_has_id(self, api):
+        inbox = api.inbox("inb_55c8c149")
+        assert inbox.id == "inb_55c8c149"
+
+    def test_inbox_has_name(self, api):
+        inbox = api.inbox("inb_55c8c149")
+        assert inbox.name == "Team"
 
 
 class TestInboxChannelListing:

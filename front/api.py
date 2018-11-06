@@ -146,6 +146,9 @@ class Api:
     def create_team_inbox(self, team_id: str, data: dict, options: RequestOptions = None):
         return self._post('team/{id}/inboxes'.format(id=team_id), data=data, options=options)
 
+    def inbox(self, inbox_id: str, options: RequestOptions = None):
+        return self._get('inboxes/{id}'.format(id=inbox_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
