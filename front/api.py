@@ -137,6 +137,15 @@ class Api:
     def team_inboxes(self, team_id: str, options: RequestOptions = None):
         return self._get('teams/{id}/inboxes'.format(id=team_id), options=options)
 
+    def create_inbox(self, data: dict, options: RequestOptions = None):
+        return self._post('inboxes', data=data, options=options)
+
+    def create_teammate_inbox(self, teammate_id: str, data: dict, options: RequestOptions = None):
+        return self._post('teammates/{id}/inboxes'.format(id=teammate_id), data=data, options=options)
+
+    def create_team_inbox(self, team_id: str, data: dict, options: RequestOptions = None):
+        return self._post('team/{id}/inboxes'.format(id=team_id), data=data, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -145,6 +154,12 @@ class Api:
         options.json = updates
 
         return self._request_endpoint('patch', endpoint, options=options)
+
+    def _post(self, endpoint: str, data: dict, options: RequestOptions = None):
+        options = options or RequestOptions()
+        options.json = data
+
+        return self._request_endpoint('post', endpoint, options=options)
 
     def _request_endpoint(
         self,
