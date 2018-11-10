@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "self": "https://api2.frontapp.com/teams/tim_55c8c149/channels"
+  },
+  "_results": [
+    {
+      "_links": {
+        "self": "https://api2.frontapp.com/channels/cha_55c8c149",
+        "related": {
+          "inbox": "https://api2.frontapp.com/channels/cha_55c8c149/inbox",
+          "owner": "https://api2.frontapp.com/teams/tim_55c8c149"
+        }
+      },
+      "id": "cha_55c8c149",
+      "address": "team@planet-express.com",
+      "type": "smtp",
+      "send_as": "team@planet-express.com",
+      "settings": {},
+      "is_private": false
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "cha_55c8c149",
+  "type": "custom",
+  "address": "dw0a0b7aeg36cb56",
+  "sendAs": "dw0a0b7aeg36cb56",
+  "settings": {
+    "webhook_url": "http://example.com"
+  }
+}
