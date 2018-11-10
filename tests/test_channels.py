@@ -91,4 +91,30 @@ class TestChannelUpdating:
 
 
 class TestChannelCreation:
-    pass
+    _data = {
+        "type": "custom",
+        "settings": {
+            "webhook_url": "http://example.com",
+        },
+    }
+
+    def test_http_method_is_correct(self, api):
+        api.create_channel(self._data)
+        req = api._requester.calls[0].request
+
+        assert req.method == "POST"
+
+    def test_json_body_is_correct(self, api):
+        api.create_channel(self._data)
+        req = api._requester.calls[0].request
+
+        assert json.loads(req.body.decode(detect_encoding(req.body), 'surrogatepass')) == {
+            "type": "custom",
+            "settings": {
+                "webhook_url": "http://example.com",
+            },
+        }
+
+    def test_response_has_id(self, api):
+        channel = api.create_channel(self._data)
+        assert channel.id == "cha_55c8c149"
