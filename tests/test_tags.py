@@ -81,7 +81,11 @@ class TestTagCreation:
 
 
 class TestTagDeletion:
-    pass
+    def test_http_method_is_correct(self, api):
+        api.delete_tag("tag_55c8c149")
+        req = api._requester.calls[0].request
+
+        assert req.method == "DELETE"
 
 
 class TestTagConversationListing:

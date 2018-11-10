@@ -200,6 +200,9 @@ class Api:
     def create_tag(self, data: dict, options: RequestOptions = None):
         return self._post('tags', data=data, options=options)
 
+    def delete_tag(self, tag_id: str, options: RequestOptions = None):
+        return self._delete('tags/{id}'.format(id=tag_id), options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -214,6 +217,9 @@ class Api:
         options.json = data
 
         return self._request_endpoint('post', endpoint, options=options)
+
+    def _delete(self, endpoint: str, options: RequestOptions = None):
+        return self._request_endpoint('delete', endpoint, options=options)
 
     def _request_endpoint(
         self,

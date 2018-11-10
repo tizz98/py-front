@@ -33,6 +33,7 @@ class RequesterMock(RequesterInterface):
         'get',
         'patch',
         'post',
+        'delete',
     }
 
     def __init__(self):
@@ -60,7 +61,7 @@ class RequesterMock(RequesterInterface):
                 responses.add(options.method.upper(), options.url, body=data)
             else:
                 raise RuntimeError('no file found. Tried: {!r} and {!r}'.format(path, path + '.json'))
-        elif options.method == 'patch':
+        elif options.method in {'patch', 'delete'}:
             responses.add(options.method.upper(), options.url, status=204)
         elif options.method == 'post':
             data = None
