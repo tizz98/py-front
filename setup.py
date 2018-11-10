@@ -18,8 +18,8 @@ setup(
     license="MIT",
     keywords="front api frontapp",
     install_requires=[
-        "requests==2.20.0",
-        "marshmallow==2.16.3",
+        "requests==2.20.1",
+        "requests_toolbelt==0.8.0",
         "pytz==2018.7",
         "pyjwt==1.6.4",
     ],

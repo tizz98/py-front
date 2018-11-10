@@ -1,12 +1,13 @@
 from datetime import datetime
 from enum import Enum
-from typing import NamedTuple, List, Union, Optional, Any
+from typing import NamedTuple, List, Union, Optional, Any, Dict, Tuple, TypeVar
 import urllib.parse
 
 import requests
+from requests_toolbelt import MultipartEncoder
 
 from .marshalling import FrontObject, timestamp
-from .requests import RequestsRequester, RequestOptions
+from .requests import RequestsRequester, RequestOptions, FileLike
 
 
 class Status(Enum):
@@ -39,6 +40,11 @@ AnalyticsParameters = NamedTuple('AnalyticsParameters', (
     ('timezone', Optional[str]),
     ('metrics', List[str]),
 ))
+
+FileName = TypeVar('FileName', bound=str)
+FileMimeType = TypeVar('FileMimeType', bound=str)
+Attachment = Tuple[FileName, FileLike, FileMimeType]
+MultipartData = Dict[str, Union[str, Attachment]]
 
 
 class Api:
@@ -211,6 +217,34 @@ class Api:
     ):
         return self._get('tags/{id}/conversations'.format(id=tag_id), search=search, options=options)
 
+    def send_message(
+        self,
+        channel_id: str,
+        data: dict,
+        attachments: List[Attachment] = None,
+        options: RequestOptions = None,
+    ):
+        """
+        Send new message (https://dev.frontapp.com/#send-new-message)
+
+        When needing to send attachments with a message, multipart form data
+        is used instead of a json request. Attachments must be in the following
+        format:
+            attachments=[('myfile.png', open('myfile.png', 'rb), 'image/png')]
+
+        Tuple indices:
+            0: the file name
+            1: a file like object
+            2: the file mime type
+        """
+        endpoint = 'channels/{id}/messages'.format(id=channel_id)
+
+        if isinstance(attachments, list) and len(attachments) > 0:
+            data['attachments'] = attachments
+            return self._multipart_request('post', endpoint, multipart_data=data, options=options)
+
+        return self._post(endpoint, data=data, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -267,6 +301,30 @@ class Api:
         options.headers.setdefault('Accept', 'application/json')
 
         return self._requester.request(options)
+
+    def _multipart_request(
+        self,
+        method: str,
+        endpoint: str,
+        multipart_data: MultipartData,
+        options: RequestOptions = None,
+    ):
+        """
+        https://dev.frontapp.com/#send-multipart-request
+
+        The JSON data you would normally send in the request body needs to be split in multiple
+        form fields (one for each property) named after the property key. If the property is an array,
+        the name should include the index of the data (ie: {"to": [email1@example.com, email1@example.com]}
+        would be split in two fields named to[0], to[1]).
+        """
+        multipart_enc = MultipartEncoder(fields=multipart_data)
+
+        options = options or RequestOptions()
+        options.data = multipart_enc
+        options.headers = (options.headers or {})
+        options.headers['Content-Type'] = multipart_enc.content_type
+
+        return self._request_endpoint(method, endpoint, options=options)
 
 
 def add_search_parameters(params: Optional[SearchParameters], options: RequestOptions) -> None:

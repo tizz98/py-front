@@ -4,6 +4,7 @@ twine==1.12.1
 wheel==0.32.2
 tox==3.5.3
 pytest==3.9.3
+pytest-cov==2.6.0
 pytest-mock==1.10.0
 pytest-spec==1.1.0
 responses==0.10.2

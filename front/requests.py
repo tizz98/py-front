@@ -75,6 +75,19 @@ class RequestOptions:
         else:
             self.params[name] = value
 
+    def accept_json(self) -> bool:
+        if isinstance(self.headers, dict):
+            return self._accept() == 'application/json'
+        return False
+
+    def accept_plain_text(self) -> bool:
+        if isinstance(self.headers, dict):
+            return self._accept() == 'text/plain'
+        return False
+
+    def _accept(self) -> str:
+        return (self.headers.get('Accept', '') or '').lower()
+
     def _set_value(self, attr: str, value: Any, default: Any = None) -> None:
         if value is self._default:
             value = default

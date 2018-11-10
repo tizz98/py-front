@@ -49,11 +49,16 @@ class RequesterMock(RequesterInterface):
         path = os.path.join(TESTDATA_DIR, parsed.path.lstrip('/'))
 
         if options.method == 'get':
-            if os.path.exists(path + '.json'):
+            if options.accept_json() and os.path.exists(path + '.json'):
                 with open(path + '.json') as f:
                     data = json.load(f)
 
                 responses.add(options.method.upper(), options.url, json=data)
+            elif options.accept_plain_text() and os.path.exists(path + '.txt'):
+                with open(path + '.txt') as f:
+                    data = f.read()
+
+                responses.add(options.method.upper(), options.url, body=data)
             elif os.path.exists(path):
                 with open(path, 'rb') as f:
                     data = f.read()

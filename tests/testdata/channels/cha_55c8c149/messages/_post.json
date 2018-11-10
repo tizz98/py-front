@@ -1,0 +1,46 @@
+{
+  "_links": {
+    "self": "https://api2.frontapp.com/messages/msg_55c8c149",
+    "related": {
+      "conversation": "https://api2.frontapp.com/conversations/cnv_55c8c149",
+      "message_replied_to": "https://api2.frontapp.com/messages/msg_1ab23cd4"
+    }
+  },
+  "id": "msg_55c8c149",
+  "type": "email",
+  "created_at": 1453770984.123,
+  "author": {
+    "_links": {
+      "self": "https://api2.frontapp.com/teammates/tea_55c8c149",
+      "related": {
+        "inboxes": "https://api2.frontapp.com/teammates/tea_55c8c149/inboxes",
+        "conversations": "https://api2.frontapp.com/teammates/tea_55c8c149/conversations"
+      }
+    },
+    "id": "tea_55c8c149",
+    "email": "leela@planet-express.com",
+    "username": "leela",
+    "first_name": "Leela",
+    "last_name": "Turanga",
+    "is_admin": true,
+    "is_available": true
+  },
+  "recipients": [
+    {
+      "_links": {
+        "related": {
+          "contact": "https://api2.frontapp.com/contacts/crd_55c8c149"
+        }
+      },
+      "handle": "calculon@momsbot.com",
+      "role": "to"
+    }
+  ],
+  "metadata": {},
+  "is_inbound": false,
+  "is_draft": true,
+  "blurb": "Why is Zoidberg the only one still...",
+  "body": "Why is Zoidberg the only one still alone?",
+  "text": "Why is Zoidberg the only one still alone?",
+  "attachments": []
+}
