@@ -1,3 +1,8 @@
+import json
+
+from front.marshalling import detect_encoding
+
+
 class TestTagListing:
     def test_tag_has_id(self, api):
         tags = api.tags()
@@ -54,7 +59,25 @@ class TestTagRetrieval:
 
 
 class TestTagCreation:
-    pass
+    _data = {"name": "Robots"}
+
+    def test_http_method_is_correct(self, api):
+        api.create_tag(self._data)
+        req = api._requester.calls[0].request
+
+        assert req.method == 'POST'
+
+    def test_json_body_is_correct(self, api):
+        api.create_tag(self._data)
+        req = api._requester.calls[0].request
+
+        assert json.loads(req.body.decode(detect_encoding(req.body), 'surrogatepass')) == {
+            "name": "Robots",
+        }
+
+    def test_response_has_id(self, api):
+        tag = api.create_tag(self._data)
+        assert tag.id == "tag_55c8c149"
 
 
 class TestTagDeletion:

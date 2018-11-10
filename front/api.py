@@ -197,6 +197,9 @@ class Api:
     def team_tags(self, team_id: str, options: RequestOptions = None):
         return self._get('teams/{id}/tags'.format(id=team_id), options=options)
 
+    def create_tag(self, data: dict, options: RequestOptions = None):
+        return self._post('tags', data=data, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
