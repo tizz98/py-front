@@ -1,3 +1,8 @@
+import json
+
+from front.marshalling import detect_encoding
+
+
 class TestChannelListing:
     def test_channel_has_id(self, api):
         channels = api.channels()
@@ -58,7 +63,31 @@ class TestChannelRetrieval:
 
 
 class TestChannelUpdating:
-    pass
+    def test_http_method_is_correct(self, api):
+        api.update_channel("cha_55c8c149", updates={
+            "settings": {
+                "webhook_url": "https://example.io",
+            },
+        })
+
+        req = api._requester.calls[0].request
+
+        assert req.method == 'PATCH'
+
+    def test_json_body_is_correct(self, api):
+        api.update_channel("cha_55c8c149", updates={
+            "settings": {
+                "webhook_url": "https://example.io",
+            },
+        })
+
+        req = api._requester.calls[0].request
+
+        assert json.loads(req.body.decode(detect_encoding(req.body), 'surrogatepass')) == {
+            "settings": {
+                "webhook_url": "https://example.io",
+            },
+        }
 
 
 class TestChannelCreation:

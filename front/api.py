@@ -179,6 +179,9 @@ class Api:
     def channel(self, channel_id: str, options: RequestOptions = None):
         return self._get('channels/{id}'.format(id=channel_id), options=options)
 
+    def update_channel(self, channel_id: str, updates: dict, options: RequestOptions = None):
+        return self._patch('channels/{id}'.format(id=channel_id), updates=updates, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
