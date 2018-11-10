@@ -185,6 +185,32 @@ class Api:
     def create_channel(self, data: dict, options: RequestOptions = None):
         return self._post('channels', data=data, options=options)
 
+    def tags(self, options: RequestOptions = None):
+        return self._get('tags', options=options)
+
+    def tag(self, tag_id: str, options: RequestOptions = None):
+        return self._get('tags/{id}'.format(id=tag_id), options=options)
+
+    def teammate_tags(self, teammate_id: str, options: RequestOptions = None):
+        return self._get('teammates/{id}/tags'.format(id=teammate_id), options=options)
+
+    def team_tags(self, team_id: str, options: RequestOptions = None):
+        return self._get('teams/{id}/tags'.format(id=team_id), options=options)
+
+    def create_tag(self, data: dict, options: RequestOptions = None):
+        return self._post('tags', data=data, options=options)
+
+    def delete_tag(self, tag_id: str, options: RequestOptions = None):
+        return self._delete('tags/{id}'.format(id=tag_id), options=options)
+
+    def tag_conversations(
+        self,
+        tag_id: str,
+        search: ConversationSearchParameters = None,
+        options: RequestOptions = None,
+    ):
+        return self._get('tags/{id}/conversations'.format(id=tag_id), search=search, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
@@ -199,6 +225,9 @@ class Api:
         options.json = data
 
         return self._request_endpoint('post', endpoint, options=options)
+
+    def _delete(self, endpoint: str, options: RequestOptions = None):
+        return self._request_endpoint('delete', endpoint, options=options)
 
     def _request_endpoint(
         self,
