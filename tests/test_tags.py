@@ -89,4 +89,15 @@ class TestTagDeletion:
 
 
 class TestTagConversationListing:
-    pass
+    def test_conversation_has_id(self, api):
+        conversations = api.tag_conversations("tag_55c8c149")
+        assert conversations[0].id == "cnv_55c8c149"
+
+    def test_conversation_has_subject(self, api):
+        conversations = api.tag_conversations("tag_55c8c149")
+        assert conversations[0].subject == "You broke my heart, Hubert."
+
+    def test_conversations_are_iterable(self, api):
+        conversations = api.tag_conversations("tag_55c8c149")
+        assert len(conversations) == 1
+        assert list(conversations)

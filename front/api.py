@@ -203,6 +203,14 @@ class Api:
     def delete_tag(self, tag_id: str, options: RequestOptions = None):
         return self._delete('tags/{id}'.format(id=tag_id), options=options)
 
+    def tag_conversations(
+        self,
+        tag_id: str,
+        search: ConversationSearchParameters = None,
+        options: RequestOptions = None,
+    ):
+        return self._get('tags/{id}/conversations'.format(id=tag_id), search=search, options=options)
+
     def _get(self, endpoint: str, search: EventSearchParameters = None, options: RequestOptions = None):
         return self._request_endpoint('get', endpoint, search=search, options=options)
 
