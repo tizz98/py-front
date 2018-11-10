@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "self": "https://api2.frontapp.com/tags"
+  },
+  "_results": [
+    {
+      "_links": {
+        "self": "https://api2.frontapp.com/tags/tag_55c8c149",
+        "related": {
+          "conversations": "https://api2.frontapp.com/tags/tag_55c8c149/conversations",
+          "owner": "https://api2.frontapp.com/teams/tim_55c8c149"
+        }
+      },
+      "id": "tag_55c8c149",
+      "name": "Robots",
+      "is_private": false
+    }
+  ]
+}
