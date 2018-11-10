@@ -40,7 +40,7 @@ class RequesterMock(RequesterInterface):
         self.calls = []
 
     @responses.activate
-    def request(self, options: RequestOptions) -> requests.Response:
+    def request(self, options):
         if options.method not in self._allowed_methods:
             raise RuntimeError('unsupported method: %r' % options.method)
 
