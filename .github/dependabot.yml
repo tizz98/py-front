@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "13:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - tizz98
+  ignore:
+  - dependency-name: twine
+    versions:
+    - 3.3.0
+    - 3.4.0
+  - dependency-name: flake8
+    versions:
+    - 3.8.4
+    - 3.9.0
+  - dependency-name: pytz
+    versions:
+    - "2020.5"
+  - dependency-name: marshmallow
+    versions:
+    - 3.10.0
